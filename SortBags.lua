@@ -64,7 +64,7 @@ local MOUNTS = set(
 	21218, 21321, 21323, 21324, 21176
 )
 
-local SPECIAL = set(5462, 17696, 17117, 13347, 13289, 11511)
+local SPECIAL = set(41915, 61000, 5462, 17696, 17117, 13347, 13289, 11511)
 
 local KEYS = set(9240, 17191, 13544, 12324, 16309, 12384, 20402)
 
@@ -326,7 +326,8 @@ do
 				if item then
 					local _, count = GetContainerItemInfo(container, position)
 					slot.item = item
-					slot.count = count < 0 and 1 or count
+					if count < 0 then count = 1 end
+					slot.count = count
 					counts[item] = (counts[item] or 0) + count
 				end
 				insert(model, slot)
