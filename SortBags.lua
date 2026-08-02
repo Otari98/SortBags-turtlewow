@@ -3,25 +3,6 @@ setfenv(1, setmetatable(_M, {__index=_G}))
 
 CreateFrame('GameTooltip', 'SortBagsTooltip', nil, 'GameTooltipTemplate')
 
-local function IsPlayingOnTurtleWoW()
-	-- https://github.com/refaim/Turtle-WoW-UI-Source/blob/d6137c2ebd291f10ce284e586a5733dd5141bef2/Interface/FrameXML/TargetFrame.xml#L183
-	return TargetHPText ~= nil and TargetHPPercText ~= nil
-end
-
-local function IsSuperWoWLoaded()
-	-- https://github.com/balakethelock/SuperWoW/wiki/Features
-	return SetAutoloot ~= nil
-end
-
-local function GetContainerItemCount(container, position)
-	local _, countOrCharges = GetContainerItemInfo(container, position)
-	local count = countOrCharges
-	if IsSuperWoWLoaded() and countOrCharges < 0 then
-		count = 1
-	end
-	return count
-end
-
 local CONTAINERS
 
 function _G.SortBags()
@@ -87,7 +68,7 @@ local SPECIAL = set(5462, 17696, 17117, 13347, 13289, 11511)
 
 local KEYS = set(9240, 17191, 13544, 12324, 16309, 12384, 20402)
 
-local TOOLS = set(7005, 12709, 19727, 5956, 2901, 6219, 10498, 6218, 6339, 11130, 11145, 16207, 9149, 15846, 6256, 6365, 6367)
+local TOOLS = set(41328, 55155, 41326, 50006, 42004, 36700, 7005, 12709, 19727, 5956, 2901, 6219, 10498, 6218, 6339, 11130, 11145, 16207, 9149, 15846, 6256, 6365, 6367)
 
 local ENCHANTING_MATERIALS = set(
 	-- dust
@@ -108,12 +89,12 @@ local CLASSES = {
 	-- arrow
 	{
 		containers = {2101, 5439, 7278, 11362, 3573, 3605, 7371, 8217, 2662, 19319, 18714},
-		items = set(2512, 2515, 3030, 3464, 9399, 11285, 12654, 18042, 19316),
+		items = set(42201, 42198, 42199, 42200, 10579, 2512, 2515, 3030, 3464, 9399, 11285, 12654, 18042, 19316),
 	},
 	-- bullet
 	{
 		containers = {2102, 5441, 7279, 11363, 3574, 3604, 7372, 8218, 2663, 19320},
-		items = set(2516, 2519, 3033, 3465, 4960, 5568, 8067, 8068, 8069, 10512, 10513, 11284, 11630, 13377, 15997, 19317),
+		items = set(42202, 2516, 2519, 3033, 3465, 4960, 5568, 8067, 8068, 8069, 10512, 10513, 11284, 11630, 13377, 15997, 19317),
 	},
 	-- soul
 	{
@@ -136,11 +117,7 @@ local CLASSES = {
 	},
 }
 
-local defaultDelay = .2
-if IsPlayingOnTurtleWoW() then
-	-- https://turtle-wow.org/bug-report?id=2395
-	defaultDelay = 1.2
-end
+local defaultDelay = .5
 
 local model, itemStacks, itemClasses, itemSortKeys
 
@@ -347,9 +324,9 @@ do
 				local slot = {container=container, position=position, class=class}
 				local item = Item(container, position)
 				if item then
-					local count = GetContainerItemCount(container, position)
+					local _, count = GetContainerItemInfo(container, position)
 					slot.item = item
-					slot.count = count
+					slot.count = count < 0 and 1 or count
 					counts[item] = (counts[item] or 0) + count
 				end
 				insert(model, slot)
